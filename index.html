@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>callback练习</title>
+</head>
+<body>
+一、什么是回调函数：
+
+回调的语义化（在网上看到这样的一段总结感觉用来描述回调的机理恰到好处）：
+
+你到一个商店买东西，刚好你要的东西没有货，于是你在店员那里留下了你的电话，
+
+过了几天店里有货了，店员就打了你的电话，然后你接到电话后就到店里去取了货。
+
+在这个例子里，你的电话号码就叫回调函数，你把电话留给店员就叫登记回调函数，
+
+店里后来有货了叫做触发了回调关联的事件，店员给你打电话叫做调用回调函数，
+
+你到店里去取货叫做响应回调事件。
+
+二、初步认识回调：
+
+$('#element').fadeIn('slow', function(){
+    //callback function     
+});  
+
+这里是调用了JQuery里的fadeIn()方法，这个方法接受两个参数：淡入的速度和一个可选的回调方法。
+
+在这个回调函数里你可以做任何你想干的事。当fadeIn()方法执行完后，回调函数会被执行。
+
+你可以通过传入第一个参数的值来延迟回调函数的执行。
+
+三、如何写回调：
+
+function myShop(name1, name2, callback){  
+    console.log(1+1)  
+    console.log('您需要的' + name1 + ', ' + name2+'商品没有了');
+    var name = name1 + name2;
+    if(callback && typeof(callback) === "function")callback(name);    
+}  	
+//正常调用参数  
+myShop('ham', 'cheese', function(){
+    console.log(1+2)  
+    console.log('超市已经上满了货，等你来取货');  
+    console.log(name)
+}); 
+//测试不正常参数
+myShop('ham', 'cheese','aa')
+
+myShop函数接受3个参数：第三个参数就是回调函数，当执行这个方法时会弹出第一个弹框，
+
+然后才执行回调函数注意这里的第三个参数是一段函数声明，这段声明在myShop被执行。
+
+
+四、让回调函数变为可选：
+
+如果我们在函数中声明了回调函数，调用的时候没有传值给这个回调函数;
+
+会报错“callback is not a function”；因此我们需要在此做判断if(callback)callback();
+
+就可以解决报错的问题,但是这样的话不是根本解决问题的;如果用户任意传入一个非函数的值，
+
+仍然会报错，因此全能之计就是让回调函数必须是一个Function，所以我们可以这样判断
+
+if(callback && typeof(callback) === "function")callback();
+
+typeof()用来返回传入值的类型;
+
+五、对于延时的注意（附加）
+
+尽管回调函数总是在最后执行的，但不总是这样，如果回调函数中有一个异步的方法调用，
+
+这时候回调函数会在异步方法调用后执行，但是也可能在异步方法返回之前返回，如jq的动画：
+
+function myShop(param1, param2, callback) {  
+    alert('您需要的' + name1 + ', ' + name2+'商品没有了');  
+    $('#sandwich').animate({  
+      opacity: 0  
+    }, 5000, function() {  
+      // Animation complete.  
+    });  
+    if (callback && typeof(callback) === "function") {  
+      callback();  
+    }  
+}  
+
+myShop('ham', 'cheese', function() {   
+    alert('超市已经上满了货，等你来取货');  
+});
+
+尽管回调在异步函数调用之后执行，但是在异步函数返回之前，回调函数就已经结束了。
+
+为了解决这种问题，我建议把回调函数放入animate的回调函数里面。
+
+虽然这不能覆盖所有的方法，但是回调函数最基本的意义就在于最后执行。
+
+注意：
+
+回调函数的使用一般是在异步事件中使用，回调函数中的方法是在函数执行完后，执行的；
+
+回调函数需要通过外层函数来传值，因为回调函数是一个匿名函数
+
+js异步加载（各执行各的）
+
+当一个函数执行需要很久的时候JS就会异步执行下一个函数，而不会等当前函数执行完再执行下面的函数
+
+回调函数：（真正用途）
+
+回调函数呢就是为了防止这样而在一个函数执行完之前不让程序先去执行下面的函数，
+
+因为下面的函数可能需要上面执行函数的返回值，所以才出来了回调函数。
+
+
+<ul>
+	<li>1</li>
+	<li>2</li>
+	<li>3</li>
+</ul>
+
+</body>
+</html>
+<script type="text/javascript">
+	// function myShop(name1, name2, callback){  
+	// 	console.log(1+1)  
+	//     console.log('您需要的' + name1 + ', ' + name2+'商品没有了');
+	//     var name = name1 + name2;
+	//     if(callback && typeof(callback) === "function")callback(name);    
+	// }  	  
+	// myShop('ham', 'cheese', function(name){
+	//     console.log(1+2)  
+	//     console.log('超市已经上满了货，等你来取货');  
+	//     console.log(name)
+	// }); 
+	// // myShop('ham', 'cheese','aa')
+
+	// var async=function(callback){
+ //        alert('请确认显示时间')
+ //        setTimeout(function(){
+	//         console.log(new Date())
+	//     },1000);//1秒后回调
+	// 	callback();
+	// };
+	// //使用
+	// async(function(data){
+
+	// });
+
+// element.addEventListener(event, function, useCapture);
+// 第一个参数是事件的类型 (如 "click" 或 "mousedown").
+// 第二个参数是事件触发后调用的函数。
+// 第三个参数是个布尔值用于描述事件是冒泡还是捕获。该参数是可选的。
+
+//removeEventListener() 方法移除由 addEventListener() 方法添加的事件句柄:
+//removeEventListener() 方法不能移除匿名函数
+// true  为捕获 ul --> li  外 --> 里
+// false 为冒泡 li --> ul  里 --> 外
+
+var li = document.querySelector('ul li')
+li.addEventListener('click',function(){alert('你点击了li元素')},true)
+document.querySelector('ul').addEventListener('click',function(){alert('你点击了ul元素')},false)
+document.addEventListener('click',aa())
+document.removeEventListener("click",aa());
+
+function aa(){
+	alert('你点击了document元素')
+}
+
+//兼容性写法
+// var x = document.getElementById("myBtn");
+// if (x.addEventListener) {                    // 所有主流浏览器，除了 IE 8 及更早版本
+//     x.addEventListener("click", myFunction);
+// } else if (x.attachEvent) {                  // IE 8 及更早版本
+//     x.attachEvent("onclick", myFunction);
+// }
+
+</script>
